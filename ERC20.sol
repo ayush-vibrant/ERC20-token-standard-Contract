@@ -50,8 +50,12 @@ contract ERC20Token {
         return true;
     }
 
-
-
+    // Not ERC20 compilant functions.
+    function mint(uint256 noOfCoins) {
+        require(msg.sender == owner);
+        balanceOf[msg.sender] += noOfCoins;
+        totalSupply += noOfCoins;
+    }
 }
     
 
