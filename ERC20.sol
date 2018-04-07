@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity 0.4.21;
 
 
 contract ERC20Token {
@@ -6,6 +6,7 @@ contract ERC20Token {
     string public name = "ERC20 Token";
     string public symbol = "SET";
     uint8 public decimals = 18;
+    address owner = msg.sender;
 
     // contract creates 1,000,000 tokens.
     uint256 public totalSupply = 1000000 * (uint256(10) ** decimals);
@@ -18,5 +19,39 @@ contract ERC20Token {
         emit Transfer(address(0), msg.sender, totalSupply);
     }
 
-    // more stuff to come
+    function transfer(address to, uint256 value) public returns (bool success) {
+        require(balanceOf[msg.sender] >= value);
+        balanceOf[msg.sender] -= value;           // deduct from sender's balance
+        balanceOf[to] += value;                  // add to recipient's balance
+        emit Transfer(msg.sender, to, value);
+        return true;
+    }
+
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    mapping(address => mapping(address => uint256)) public allowance;
+    // In code allowance[owner][spender] 
+    // would return the number of tokens spender can spend from owner's account.
+
+    function approve(address spender, uint256 value) public returns (bool success)
+    {
+        allowance[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
+        return true;
+    }
+    function transferFrom(address from, address to, uint256 value) public returns (bool success)
+    {
+        require(value <= balanceOf[from]);
+        require(value <= allowance[from][msg.sender]);
+        balanceOf[from] -= value;
+        balanceOf[to] += value;
+        allowance[from][msg.sender] -= value;
+        emit Transfer(from, to, value);
+        return true;
+    }
+
+
+
 }
+    
+
